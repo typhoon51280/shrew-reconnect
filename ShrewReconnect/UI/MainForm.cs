@@ -3,6 +3,9 @@ using com.waldron.shrewReconnect.Util;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace com.waldron.shrewReconnect
 {
@@ -30,6 +33,8 @@ namespace com.waldron.shrewReconnect
                 this.usernameTextBox.Text = credentials.username;
                 this.passwordTextBox.Text = credentials.password;
                 this.siteConfigTextBox.Text = credentials.siteConfigPath;
+                this.formloginTextBox.Text = credentials.formLogin;
+                this.checkboxAuth.Checked = credentials.authenticateOnConnected;
                 this.checkboxConnectOnStart.Checked = credentials.connectOnStart;
                 this.checkBoxSave.Checked = true;
                 if (this.checkboxConnectOnStart.Checked)
@@ -88,6 +93,8 @@ namespace com.waldron.shrewReconnect
             credentials.password = this.passwordTextBox.Text;
             credentials.siteConfigPath = this.siteConfigTextBox.Text;
             credentials.connectOnStart = this.checkboxConnectOnStart.Checked;
+            credentials.formLogin = this.formloginTextBox.Text;
+            credentials.authenticateOnConnected = this.checkboxAuth.Checked;
             connection = new ShrewConnection(credentials);
             if (checkBoxSave.Checked)
             {
@@ -191,14 +198,17 @@ namespace com.waldron.shrewReconnect
 
         private void appendText(string text, Color color)
         {
-            /*box.SelectionStart = box.TextLength;
-            box.SelectionLength = 0;
-
-            box.SelectionColor = color;
-            box.AppendText(text);
-            box.SelectionColor = box.ForeColor;*/
-
+            Color currentColor = statusTextBox.SelectionColor;
+            if (color!=null)
+            {
+                statusTextBox.SelectionColor = color;
+            }
             statusTextBox.AppendText(text);
+            if (color != null)
+            {
+                statusTextBox.SelectionColor = currentColor;
+            }
+            statusTextBox.ScrollToCaret();
         }
 
         private void destroyConnection()
@@ -209,7 +219,7 @@ namespace com.waldron.shrewReconnect
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            UpdateChecker.CheckForUpdate();
+            // UpdateChecker.CheckForUpdate();
         }
 
         private void checkBoxSave_CheckedChanged(object sender, EventArgs e)
@@ -220,5 +230,6 @@ namespace com.waldron.shrewReconnect
                 checkboxConnectOnStart.Checked = false;
             }
         }
+
     }
 }

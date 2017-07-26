@@ -20,11 +20,15 @@ namespace com.waldron.shrewReconnect
         private Timer monitorTimer { get; set; }
         private int failedConnectAttempts { get; set; }
         private bool shuttingDown { get; set; }
+        private ShrewCredentials credentials { get; set; }
+        private ShrewAuthentication auth { get; set; }
         private ShrewClientService vpnClient { get; set; }
 
         public ShrewConnection(ShrewCredentials credentials)
         {
-            vpnClient = new ShrewClientService(credentials);
+            this.credentials = credentials;
+            this.auth = new ShrewAuthentication(credentials);
+            this.vpnClient = new ShrewClientService(credentials);
             this.shuttingDown = false;
             this.failedConnectAttempts = 0;
         }
@@ -56,7 +60,14 @@ namespace com.waldron.shrewReconnect
             if (this.shuttingDown) return;
             ShrewNotifier.SetStatus(ShrewConnectionStatus.Connected);
             ShrewNotifier.Log("Connection established.", ShrewConnectionStatus.Connected);
-            ShrewNotifier.Log("------------------------------------------------", ShrewConnectionStatus.Pending);
+            if (credentials.authenticateOnConnected)
+            {
+                this.auth.Authenticate();
+            }
+            else
+            {
+                ShrewNotifier.Log("------------------------------------------------", ShrewConnectionStatus.Pending);
+            }
         }
 
         private bool ConnectAttempt() {
@@ -115,6 +126,10 @@ namespace com.waldron.shrewReconnect
             {
                 this.monitorTimer.Dispose();
                 this.monitorTimer = null;
+            }
+            if (this.auth != null)
+            {
+                this.auth.cleanUp();
             }
             vpnClient.KillAll();
         }

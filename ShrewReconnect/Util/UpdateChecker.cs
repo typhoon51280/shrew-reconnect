@@ -72,7 +72,7 @@ namespace com.waldron.shrewReconnect.Util
                 properties.lastUpdateCheck = DateTime.UtcNow;
                 ShrewConfiguration.SaveProperties(properties);
             }
-            catch (Exception exc)
+            catch (Exception)
             {
                 //Eat all errors
             }
