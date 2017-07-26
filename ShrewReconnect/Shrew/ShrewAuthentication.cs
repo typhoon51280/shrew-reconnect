@@ -56,7 +56,7 @@ namespace com.waldron.shrewReconnect.Shrew
                 int failedAuthAttempts = 0;
                 Boolean authenticated = false;
                 await Task.Delay(STARTER_DELAY, tokenSource.Token);
-                while (!(authenticated = await tryAuth()) && ++failedAuthAttempts < RETRY_MAX && !tokenSource.IsCancellationRequested)  
+                while (!(authenticated = await tryAuth()) && ++failedAuthAttempts <= RETRY_MAX && !tokenSource.IsCancellationRequested)  
                 {
                     ShrewNotifier.Log("Auth retry #" + failedAuthAttempts +" of " + RETRY_MAX + " in " + RETRY_INTERVAL_MS + " ms ...", ShrewConnectionStatus.Pending);
                     await Task.Delay(RETRY_INTERVAL_MS, tokenSource.Token);
